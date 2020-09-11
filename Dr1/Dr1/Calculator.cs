@@ -4,7 +4,7 @@ namespace Dr1
 {
     public class Calculator
     {
-        public static int Calculate(int a, string @operator, int b)
+        public static double Calculate(double a, string @operator, double b)
         {
             return @operator switch
             {
@@ -16,9 +16,9 @@ namespace Dr1
             };
         }
 
-        public static int GetNumber()
+        public static double GetNumber()
         {
-            return int.Parse(Console.ReadLine());
+            return double.Parse(Console.ReadLine());
         }
     }
 }
