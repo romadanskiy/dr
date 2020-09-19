@@ -15,10 +15,5 @@ namespace Dr1
                 _ => throw new NotSupportedException()
             };
         }
-
-        public static double GetNumber()
-        {
-            return double.Parse(Console.ReadLine());
-        }
     }
 }
