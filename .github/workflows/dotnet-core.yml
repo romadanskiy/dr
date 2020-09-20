@@ -2,9 +2,13 @@ name: .NET Core
 
 on:
   push:
-    branches: [ master ]
+    branches: '**'
   pull_request:
-    branches: [ master ]
+    branches: '**'
+    
+defaults:
+  run:
+    working-directory: ./Dr1
 
 jobs:
   build:
