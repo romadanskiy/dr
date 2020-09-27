@@ -21,6 +21,12 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.301
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v1.6.0
+    - name: Codecov
+      uses: codecov/codecov-action@v1.0.13
+      with:
+        file: ./report.xml
     - name: Install dependencies
       run: dotnet restore
     - name: Build
