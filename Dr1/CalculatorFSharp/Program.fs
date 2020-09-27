@@ -2,23 +2,22 @@
 
 open System
 let sum x y = x + y
-let subtraction x y = x - y
+let minus x y = x - y
 let multiplay x y = x * y
 let divide x y = x / y
 
-let calculate op x y =
-    match op with
+let calculate x operation y =
+    match operation with
     | "+" -> sum x y
-    | "-" -> subtraction x y
+    | "-" -> minus x y
     | "*" -> multiplay x y
     | "/" -> divide x y
-    | _ -> raise (System.NotImplementedException("Operation is not Implement"))
+    | _ -> raise (NotImplementedException("Operation is not Implement"))
 
 [<EntryPoint>]
 let main argv =
-    let x = Console.ReadLine() |> Int32.Parse
-    let op = Console.ReadLine()
-    let y = Console.ReadLine() |> Int32.Parse
-    
-    calculate op x y |> Console.WriteLine
+    let x = Console.ReadLine() |> double
+    let operation = Console.ReadLine()
+    let y = Console.ReadLine() |> double
+    calculate x operation y |> Console.WriteLine
     0
