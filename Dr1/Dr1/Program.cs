@@ -1,5 +1,6 @@
 ﻿using System;
 using static Dr1.Calculator;
+using static Dr1.InputOutput;
 
 namespace Dr1
 {
@@ -7,14 +8,11 @@ namespace Dr1
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Введите первое число:");
-            var a = GetNumber();
-            Console.WriteLine("Введите оператор (+ - * /):");
-            var @operator = Console.ReadLine();
-            Console.WriteLine("Введите второе число:");
-            var b = GetNumber();
+            var a = InputOutput.GetNumber1();
+            var @operator = InputOutput.GetOperator();
+            var b = InputOutput.GetNumber2();
             var res = Calculate(a, @operator, b);
-            Console.WriteLine("Результат: {0}", res);
+            InputOutput.ShowResult(res);
         }
     }
 }

@@ -1,9 +1,10 @@
-﻿using NUnit.Framework;
+﻿using System;
+using NUnit.Framework;
 
 namespace Dr1
 {
     [TestFixture]
-    public class Tests
+    public class CalculatorTests
     {
         [TestCase(1, "+", 2, 3)]
         [TestCase(-3, "+", 0.5, -2.5)]
@@ -13,9 +14,17 @@ namespace Dr1
         [TestCase(1.5, "-", 2, -0.5)]
         [TestCase(6, "/", 3, 2)]
         [TestCase(5, "/", 2, 2.5)]
-        public void TestCases(double a, string @operator, double b, double expectedResult)
+        [TestCase(1, "/", 0, double.PositiveInfinity)]
+        public void CalculateTest(double a, string @operator, double b, double expectedResult)
         {
             Assert.AreEqual(expectedResult, Calculator.Calculate(a, @operator, b));
         }
+
+        [Test]
+        public void WrongOperator()
+        {
+            Assert.Throws<NotSupportedException>(() => Calculator.Calculate(8, "#", 5));
+        }
+        
     }
 }
