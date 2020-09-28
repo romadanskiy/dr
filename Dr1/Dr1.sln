@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dr1", "Dr1\Dr1.csproj", "{0
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CalculatorFSharp", "CalculatorFSharp\CalculatorFSharp.fsproj", "{FD86E617-9263-47F8-BB30-6B49C9D6CB70}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CalculatorFSharpTests", "CalculatorFSharpTests\CalculatorFSharpTests.fsproj", "{24518DF0-4DBC-4A3C-8250-68BC87B857D7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{FD86E617-9263-47F8-BB30-6B49C9D6CB70}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD86E617-9263-47F8-BB30-6B49C9D6CB70}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD86E617-9263-47F8-BB30-6B49C9D6CB70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24518DF0-4DBC-4A3C-8250-68BC87B857D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24518DF0-4DBC-4A3C-8250-68BC87B857D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24518DF0-4DBC-4A3C-8250-68BC87B857D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24518DF0-4DBC-4A3C-8250-68BC87B857D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
