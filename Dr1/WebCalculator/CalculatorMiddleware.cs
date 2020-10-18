@@ -18,40 +18,21 @@ namespace WebCalculator
 		
         public async Task InvokeAsync(HttpContext context)
         {
-            var expression = context.Request.Query["expression"];
-            if (!context.Request.Query.ContainsKey("expression"))
+            var num1 = context.Request.Query["num1"];
+            var operation = context.Request.Query["operation"];
+            if (operation == "%2b") operation = "+";
+            var num2 = context.Request.Query["num2"];
+            if (Double.TryParse(num1, out var n1) && Double.TryParse(num2, out var n2))
             {
-                await context.Response.WriteAsync("Set expression!");
-            }
-            else if (!ValidateExpression(expression))
-            {
-                context.Response.StatusCode = 403;
-                await context.Response.WriteAsync($"Expression {expression} is invalid");
+                var res = Calculator.calculate(n1, operation, n2);
+                if (res != FSharpOption<double>.None)
+                    await context.Response.WriteAsync(res.Value.ToString());
+                else
+                    context.Response.StatusCode = 404;
             }
             else
-            {
-                var (num1, operation, num2) = SplitExpression(expression);
-                var res = Calculator.calculate(num1, operation, num2);
-                if (res == FSharpOption<double>.None)
-                    await context.Response.WriteAsync("Cannot be divided by zero");
-                else 
-                    await context.Response.WriteAsync($"Result: {res.Value}");
-                await _next(context);
-            }
-        }
-
-        private static bool ValidateExpression(string expression)
-        {
-            var regex = new Regex(@"^\d+[\+\-\*\/]\d+$");
-            return regex.IsMatch(expression);
-        }
-
-        private static Tuple<double, string, double> SplitExpression(string expression)
-        {
-            var operations = new[] {'+', '-', '*', '/'};
-            var operationIndex = expression.IndexOfAny(operations);
-            var nums = expression.Split(operations);
-            return Tuple.Create(Convert.ToDouble(nums[0]), expression[operationIndex].ToString(), Convert.ToDouble(nums[1]));
+                context.Response.StatusCode = 404;
+            await _next(context);
         }
     }
 }

@@ -24,7 +24,7 @@ namespace WebCalculator
             app.UseCalculator();
             app.Run(async (context) =>
             {
-                await context.Response.WriteAsync("\nIt working!");
+                //await context.Response.WriteAsync("It is working!");
             });
         }
     }
