@@ -39,16 +39,22 @@ let Calculate num1 operation num2 =
         return Some response
    } |> Async.RunSynchronously
    
+let ProxyDependency calculate num1 operation num2 =
+    calculate num1 operation num2
+   
 let Write (res:string option) =
     match res with
-    | Some x -> Console.WriteLine(x)
+    | Some x -> Console.WriteLine("Результат: {0}", x)
     | None -> Console.WriteLine("Error")
 
 [<EntryPoint>]
 let main argv =
+    Console.WriteLine("Введите первое число:")
     let num1 = Console.ReadLine()
+    Console.WriteLine("Введите оператор:")
     let operation = Console.ReadLine().Replace("+", "%2b")
+    Console.WriteLine("Введите второе число:")
     let num2 = Console.ReadLine()
-    let res = Calculate num1 operation num2
+    let res = ProxyDependency Calculate num1 operation num2
     Write res
-    0 
+    0    
