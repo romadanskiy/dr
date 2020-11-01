@@ -91,75 +91,24 @@ namespace ClientExpressionTree
         // Возвращает Expression по обратной польской записи
         public static Expression GetExpressionTree(string[] rpn)
         {
-            var numbersStack = new Stack<double>();
-            var expressionsStack = new Stack<Expression>();
-            var numberIsFirst = false;
-
-            for (var i = 0; i < rpn.Length; i++)
+            var stack = new Stack<Expression>();
+            foreach (var element in rpn)
             {
-                var element = rpn[i];
-
                 if (IsNum(element))
-                    numbersStack.Push(double.Parse(element));
-
-                if (IsOperation(element))
+                    stack.Push(Expression.Constant(double.Parse(element)));
+                else if (IsOperation(element))
                 {
-                    Expression right;
-                    Expression left;
-                    switch (numbersStack.Count)
-                    {
-                        case 0:
-                            right = expressionsStack.Pop();
-                            left = expressionsStack.Pop();
-                            break;
-                        case 1 when numberIsFirst:
-                            right = expressionsStack.Pop();
-                            left = Expression.Constant(numbersStack.Pop());
-                            break;
-                        case 1:
-                            right = Expression.Constant(numbersStack.Pop());
-                            left = expressionsStack.Pop();
-                            break;
-                        default:
-                            if (IsNum(rpn[i - 1]) && IsNum(rpn[i - 2]))
-                            {
-                                right = Expression.Constant(numbersStack.Pop());
-                                left = Expression.Constant(numbersStack.Pop());
-                            }
-                            else if (IsNum(rpn[i - 1]) && IsOperation(rpn[i - 2]))
-                            {
-                                right = Expression.Constant(numbersStack.Pop());
-                                left = expressionsStack.Pop();
-                            }
-                            else if (IsOperation(rpn[i - 1]) && IsNum(rpn[i - 2]))
-                            {
-                                right = expressionsStack.Pop();
-                                left = Expression.Constant(numbersStack.Pop());
-                            }
-                            else
-                            {
-                                if (numberIsFirst)
-                                {
-                                    right = expressionsStack.Pop();
-                                    left = Expression.Constant(numbersStack.Pop());
-                                }
-                                else
-                                {
-                                    right = Expression.Constant(numbersStack.Pop());
-                                    left = expressionsStack.Pop();
-                                }
-                            }
-                            break;
-                    }
-                    var newExp = GetExpression(left, element, right);
-                    expressionsStack.Push(newExp);
+                    var operation = element;
+                    var right = stack.Pop();
+                    var left = stack.Pop();
+                    var newExpression = GetExpression(left, operation, right);
+                    stack.Push(newExpression);
                 }
-                
-                if (numbersStack.Count > expressionsStack.Count) numberIsFirst = true;
-                if (numbersStack.Count < expressionsStack.Count) numberIsFirst = false;
+                else
+                    throw new ArgumentException();
             }
-            
-            return expressionsStack.Pop();
+
+            return stack.Pop();
         }
 
         // супер-метод Димы Иванова
