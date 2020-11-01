@@ -83,6 +83,11 @@ namespace ClientExpressionTree
             operationsStack.Push(symbol);
         }
 
+        private static bool IsNum(string str)
+        {
+            return double.TryParse(str, out _);
+        }
+
         // Возвращает Expression по обратной польской записи
         public static Expression GetExpressionTree(string[] rpn)
         {
@@ -90,12 +95,14 @@ namespace ClientExpressionTree
             var expressionsStack = new Stack<Expression>();
             var numberIsFirst = false;
 
-            foreach (var e in rpn)
+            for (var i = 0; i < rpn.Length; i++)
             {
-                if (double.TryParse(e, out var n))
-                    numbersStack.Push(n);
-                
-                if (IsOperation(e))
+                var element = rpn[i];
+
+                if (IsNum(element))
+                    numbersStack.Push(double.Parse(element));
+
+                if (IsOperation(element))
                 {
                     Expression right;
                     Expression left;
@@ -114,11 +121,37 @@ namespace ClientExpressionTree
                             left = expressionsStack.Pop();
                             break;
                         default:
-                            right = Expression.Constant(numbersStack.Pop());
-                            left = Expression.Constant(numbersStack.Pop());
+                            if (IsNum(rpn[i - 1]) && IsNum(rpn[i - 2]))
+                            {
+                                right = Expression.Constant(numbersStack.Pop());
+                                left = Expression.Constant(numbersStack.Pop());
+                            }
+                            else if (IsNum(rpn[i - 1]) && IsOperation(rpn[i - 2]))
+                            {
+                                right = Expression.Constant(numbersStack.Pop());
+                                left = expressionsStack.Pop();
+                            }
+                            else if (IsOperation(rpn[i - 1]) && IsNum(rpn[i - 2]))
+                            {
+                                right = expressionsStack.Pop();
+                                left = Expression.Constant(numbersStack.Pop());
+                            }
+                            else
+                            {
+                                if (numberIsFirst)
+                                {
+                                    right = expressionsStack.Pop();
+                                    left = Expression.Constant(numbersStack.Pop());
+                                }
+                                else
+                                {
+                                    right = Expression.Constant(numbersStack.Pop());
+                                    left = expressionsStack.Pop();
+                                }
+                            }
                             break;
                     }
-                    var newExp = GetExpression(left, e, right);
+                    var newExp = GetExpression(left, element, right);
                     expressionsStack.Push(newExp);
                 }
                 
