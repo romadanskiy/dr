@@ -18,6 +18,15 @@ namespace ClientExpressionTree
         {
             serviceProvider = serviceCollection.BuildServiceProvider();
         }
+
+        // Метод используется, если нужно получить только результат вычисления
+        public double GetResult(string input)
+        {
+            var rpn = GetRPN(input);
+            var tree = GetExpressionTree(rpn);
+            var res = ProcessInParallelAsync(tree).Result;
+            return res;
+        }
         
         // Reverse Polish Notation (RPN) - обратная польская запись
         public string[] GetRPN(string str)
