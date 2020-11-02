@@ -1,6 +1,7 @@
 ﻿using System;
+using Dr1;
+using Microsoft.Extensions.DependencyInjection;
 using static ClientExpressionTree.InputOutput;
-using static ClientExpressionTree.Calculator;
 
 namespace ClientExpressionTree
 {
@@ -9,11 +10,16 @@ namespace ClientExpressionTree
         static void Main(string[] args)
         {
             var input = GetInputExpression();
-            var rpn = GetRPN(input);
+            
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddScoped<ICalculator, WebCalculator>();
+            var client = new Client(serviceCollection);
+            
+            var rpn = client.GetRPN(input);
             WriteRPN(rpn);
-            var tree = GetExpressionTree(rpn);
+            var tree = client.GetExpressionTree(rpn);
             WriteTree(tree);
-            var res = ProcessInParallelAsync(tree).Result;
+            var res = client.ProcessInParallelAsync(tree).Result;
             WriteResult(res);
         }
     }

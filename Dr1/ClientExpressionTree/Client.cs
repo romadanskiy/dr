@@ -4,14 +4,23 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Dr1;
+using Microsoft.Extensions.DependencyInjection;
 using static ClientExpressionTree.Operations;
 
 namespace ClientExpressionTree
 {
-    public static class Calculator
+    public class Client
     {
+        private static ServiceProvider serviceProvider;
+
+        public Client(ServiceCollection serviceCollection)
+        {
+            serviceProvider = serviceCollection.BuildServiceProvider();
+        }
+        
         // Reverse Polish Notation (RPN) - обратная польская запись
-        public static string[] GetRPN(string str)
+        public string[] GetRPN(string str)
         {
             var resultList = new List<string>();
             var operationsStack = new Stack<string>();
@@ -89,7 +98,7 @@ namespace ClientExpressionTree
         }
 
         // Возвращает Expression по обратной польской записи
-        public static Expression GetExpressionTree(string[] rpn)
+        public Expression GetExpressionTree(string[] rpn)
         {
             var stack = new Stack<Expression>();
             foreach (var element in rpn)
@@ -112,8 +121,10 @@ namespace ClientExpressionTree
         }
 
         // супер-метод Димы Иванова
-        public static async Task<double> ProcessInParallelAsync(Expression expression)
+        public async Task<double> ProcessInParallelAsync(Expression expression)
         {
+            var calculator = serviceProvider.GetService<ICalculator>();
+            
             var visitor = new Visitor();
             var lazy = new Dictionary<ExpressionNode, Lazy<Task>>();
             var executeBefore = visitor.GetExecuteBefore(expression);
@@ -128,26 +139,17 @@ namespace ClientExpressionTree
                     
                     if (exp.Expression is BinaryExpression)
                     {
-                        var client = new HttpClient();
                         var num1 = exps[0].Result;
                         var operation = GetOperation(exp.Expression);
                         var num2 = exps[1].Result;
-                        var request = GetRequest(num1, operation, num2);
-                        var response = await client.GetAsync(request);
-                        var result = response.Content.ReadAsStringAsync().Result;
-                        exp.Result = double.Parse(result);
+                        var result = calculator.Calculate(num1, operation, num2);
+                        exp.Result = result;
                     }
                 });
             }
 
             await Task.WhenAll(lazy.Values.Select(l => l.Value));
             return res.Result;
-        }
-
-        private static string GetRequest(double num1, string operation, double num2)
-        {
-            operation = operation == "+" ? "%2b" : operation;
-            return $"http://localhost:5000/?num1={num1}&operation={operation}&num2={num2}";
         }
     }
 }
