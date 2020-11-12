@@ -4,18 +4,11 @@ namespace Dr1
 {
     public class InputOutput
     {
-        public static double GetNumber1()
+        public static double GetNumber()
         {
-            Console.WriteLine("Введите первое число:");
-            var a = double.Parse(Console.ReadLine());
-            return a;
-        }
-        
-        public static double GetNumber2()
-        {
-            Console.WriteLine("Введите первое число:");
-            var a = double.Parse(Console.ReadLine());
-            return a;
+            Console.WriteLine("Введите число:");
+            var number = double.Parse(Console.ReadLine());
+            return number;
         }
 
         public static string GetOperator()

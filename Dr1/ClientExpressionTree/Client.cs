@@ -4,14 +4,32 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Dr1;
+using Microsoft.Extensions.DependencyInjection;
 using static ClientExpressionTree.Operations;
 
 namespace ClientExpressionTree
 {
-    public static class Calculator
+    public class Client
     {
+        private static ServiceProvider serviceProvider;
+
+        public Client(ServiceCollection serviceCollection)
+        {
+            serviceProvider = serviceCollection.BuildServiceProvider();
+        }
+
+        // Метод используется, если нужно получить только результат вычисления
+        public double GetResult(string input)
+        {
+            var rpn = GetRPN(input);
+            var tree = GetExpressionTree(rpn);
+            var res = ProcessInParallelAsync(tree).Result;
+            return res;
+        }
+        
         // Reverse Polish Notation (RPN) - обратная польская запись
-        public static string[] GetRPN(string str)
+        public string[] GetRPN(string str)
         {
             var resultList = new List<string>();
             var operationsStack = new Stack<string>();
@@ -83,55 +101,39 @@ namespace ClientExpressionTree
             operationsStack.Push(symbol);
         }
 
-        // Возвращает Expression по обратной польской записи
-        public static Expression GetExpressionTree(string[] rpn)
+        private static bool IsNum(string str)
         {
-            var numbersStack = new Stack<double>();
-            var expressionsStack = new Stack<Expression>();
-            var numberIsFirst = false;
+            return double.TryParse(str, out _);
+        }
 
-            foreach (var e in rpn)
+        // Возвращает Expression по обратной польской записи
+        public Expression GetExpressionTree(string[] rpn)
+        {
+            var stack = new Stack<Expression>();
+            foreach (var element in rpn)
             {
-                if (double.TryParse(e, out var n))
-                    numbersStack.Push(n);
-                
-                if (IsOperation(e))
+                if (IsNum(element))
+                    stack.Push(Expression.Constant(double.Parse(element)));
+                else if (IsOperation(element))
                 {
-                    Expression right;
-                    Expression left;
-                    switch (numbersStack.Count)
-                    {
-                        case 0:
-                            right = expressionsStack.Pop();
-                            left = expressionsStack.Pop();
-                            break;
-                        case 1 when numberIsFirst:
-                            right = expressionsStack.Pop();
-                            left = Expression.Constant(numbersStack.Pop());
-                            break;
-                        case 1:
-                            right = Expression.Constant(numbersStack.Pop());
-                            left = expressionsStack.Pop();
-                            break;
-                        default:
-                            right = Expression.Constant(numbersStack.Pop());
-                            left = Expression.Constant(numbersStack.Pop());
-                            break;
-                    }
-                    var newExp = GetExpression(left, e, right);
-                    expressionsStack.Push(newExp);
+                    var operation = element;
+                    var right = stack.Pop();
+                    var left = stack.Pop();
+                    var newExpression = GetExpression(left, operation, right);
+                    stack.Push(newExpression);
                 }
-                
-                if (numbersStack.Count > expressionsStack.Count) numberIsFirst = true;
-                if (numbersStack.Count < expressionsStack.Count) numberIsFirst = false;
+                else
+                    throw new ArgumentException();
             }
-            
-            return expressionsStack.Pop();
+
+            return stack.Pop();
         }
 
         // супер-метод Димы Иванова
-        public static async Task<double> ProcessInParallelAsync(Expression expression)
+        public async Task<double> ProcessInParallelAsync(Expression expression)
         {
+            var calculator = serviceProvider.GetService<ICalculator>();
+            
             var visitor = new Visitor();
             var lazy = new Dictionary<ExpressionNode, Lazy<Task>>();
             var executeBefore = visitor.GetExecuteBefore(expression);
@@ -146,26 +148,17 @@ namespace ClientExpressionTree
                     
                     if (exp.Expression is BinaryExpression)
                     {
-                        var client = new HttpClient();
                         var num1 = exps[0].Result;
                         var operation = GetOperation(exp.Expression);
                         var num2 = exps[1].Result;
-                        var request = GetRequest(num1, operation, num2);
-                        var response = await client.GetAsync(request);
-                        var result = response.Content.ReadAsStringAsync().Result;
-                        exp.Result = double.Parse(result);
+                        var result = calculator.Calculate(num1, operation, num2);
+                        exp.Result = result;
                     }
                 });
             }
 
             await Task.WhenAll(lazy.Values.Select(l => l.Value));
             return res.Result;
-        }
-
-        private static string GetRequest(double num1, string operation, double num2)
-        {
-            operation = operation == "+" ? "%2b" : operation;
-            return $"http://localhost:5000/?num1={num1}&operation={operation}&num2={num2}";
         }
     }
 }

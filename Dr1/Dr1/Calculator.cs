@@ -2,16 +2,19 @@
 
 namespace Dr1
 {
-    public class Calculator
+    public class Calculator : ICalculator
     {
-        public static double Calculate(double a, string @operator, double b)
+        public double Calculate(double num1, string operation, double num2)
         {
-            return @operator switch
+            if (operation == "/" && num2 == 0)
+                throw new ArgumentException("Нельзя делить на ноль");
+            
+            return operation switch
             {
-                "+" => a + b,
-                "-" => a - b,
-                "*" => a * b,
-                "/" => a / b,
+                "+" => num1 + num2,
+                "-" => num1 - num2,
+                "*" => num1 * num2,
+                "/" => num1 / num2,
                 _ => throw new NotSupportedException()
             };
         }

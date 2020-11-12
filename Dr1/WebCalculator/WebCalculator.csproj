@@ -5,7 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\CalculatorFSharp\CalculatorFSharp.fsproj" />
+        <ProjectReference Include="..\Dr1\Dr1.csproj" />
     </ItemGroup>
 
 </Project>
