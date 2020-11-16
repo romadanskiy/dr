@@ -11,11 +11,23 @@ namespace EditorFor
 {
     public static class MyEditorFor
     {
-        // Аналог Html.EditorFor
+        // Аналог Html.EditorForModel
         public static IHtmlContent MyEditorForModel(this IHtmlHelper helper, object model)
         {
             var content = new HtmlContentBuilder();
             foreach (var str in GetForm(model))
+            {
+                content.AppendHtml(str);
+            }
+
+            return content;
+        }
+        
+        // Аналог Html.EditorFor
+        public static IHtmlContent MyEditorForProperty(this IHtmlHelper helper, object obj)
+        {
+            var content = new HtmlContentBuilder();
+            foreach (var str in Process(new PropertyNode(obj)))
             {
                 content.AppendHtml(str);
             }
@@ -35,18 +47,18 @@ namespace EditorFor
         // Возвращает список блоков div с input для определенного свойства или всей моедли
         public static IEnumerable<string> GetForm(object obj)
         {
-            var type = obj.GetType();
-            var root = new PropertyNode(type, obj);
-            foreach (var str in type
+            var root = new PropertyNode(obj);
+            foreach (var str in root
+                .Type
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .SelectMany(p => Process(new PropertyNode(p, root, p.GetValue(obj)))))
+                .SelectMany(p => Process(new PropertyNode(p.GetValue(obj), p, root))))
                 yield return str;
         }
         
         // Генерирует html код
         private static IEnumerable<string> Process(PropertyNode node)
         {
-            yield return $"<div class='editor-label'><label for='{node.Property.Name}'>{node.Property.Name}</label></div>";
+            yield return $"<div class='editor-label'><label for='{node.Name}'>{node.Name}</label></div>";
 
             if (InputTypes.Keys.Contains(node.Type))
             {
@@ -62,7 +74,7 @@ namespace EditorFor
                 foreach (var str in node
                     .Type
                     .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                    .SelectMany(p => Process(new PropertyNode(p, node, p.GetValue(node.Value)))))
+                    .SelectMany(p => Process(new PropertyNode(p.GetValue(node.Value), p, node))))
                     yield return str;
             }
             else
@@ -77,8 +89,8 @@ namespace EditorFor
             return $"<div class='editor-field'>" +
                    $"<input " +
                    $"type='{InputTypes[node.Type]}' " +
-                   $"id='{node.Property.Name}' " +
-                   $"name='{node.Property.Name}' " +
+                   $"id='{node.Name}' " +
+                   $"name='{node.Name}' " +
                    $"value='{node.Value}'" +
                    $"{Checked(node)}>" +
                    $"</div>";
@@ -88,7 +100,7 @@ namespace EditorFor
         private static string GetSelect(PropertyNode node)
         {
             return $"<div class='editor-field'>" +
-                   $"<select name='{node.Property.Name}'>" +
+                   $"<select name='{node.Name}'>" +
                    node
                        .Type
                        .GetEnumNames()
@@ -117,24 +129,17 @@ namespace EditorFor
     // Перед добавлением узла в дерево поднимаемся вверх по его ветке, если нашли совпадение => зацикливание
     class PropertyNode
     {
-        public PropertyInfo Property { get; set; }
-        public PropertyNode Parent { get; set; }
-        public object Value { get; set; }
-        
-        public Type Type { get; set; }
+        public string Name { get; }
+        public PropertyNode Parent { get; }
+        public object Value { get; }
+        public Type Type { get; }
 
-        public PropertyNode(Type type, object obj)
+        public PropertyNode(object value, PropertyInfo property = null, PropertyNode parent = null)
         {
-            Value = obj;
-            Type = obj.GetType();
-        }
-        
-        public PropertyNode(PropertyInfo property, PropertyNode parent, object obj)
-        {
-            Property = property;
+            Value = value;
+            Type = value.GetType();
+            Name = property?.Name;
             Parent = parent;
-            Value = obj;
-            Type = Property.PropertyType;
         }
         
         public void CheckType(Type type)
@@ -144,5 +149,5 @@ namespace EditorFor
 
             Parent?.CheckType(type);
         }
-    } 
+    }
 }
