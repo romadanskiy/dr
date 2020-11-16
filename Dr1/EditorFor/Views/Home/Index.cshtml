@@ -1,0 +1,19 @@
+﻿@model EditorFor.Models.TestModel
+
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <div class="row">
+        <div class="col">
+            <h2>Default EditorFor:</h2>
+            @Html.EditorForModel(Model)
+        </div>
+        <div class="col">
+            <h2>Custom EditorFor:</h2>
+            @Html.MyEditorForModel(Model)
+        </div>
+    </div>
+</div>
