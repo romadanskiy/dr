@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace ClientExpressionTree
 {
-    public class Visitor : ExpressionVisitor
+    public class Visitor : DynamicExpressionVisitor
     {
         private readonly Dictionary<ExpressionNode, ExpressionNode[]> executeBefore = new Dictionary<ExpressionNode, ExpressionNode[]>();
 
@@ -14,7 +14,7 @@ namespace ClientExpressionTree
             return executeBefore;
         }
         
-        protected override Expression VisitBinary(BinaryExpression binaryExpression)
+        protected override Expression VisitExpression(BinaryExpression binaryExpression)
         {
             Visit(binaryExpression.Left);
             Visit(binaryExpression.Right);
@@ -27,7 +27,7 @@ namespace ClientExpressionTree
             return binaryExpression;
         }
 
-        protected override Expression VisitConstant(ConstantExpression constantExpression)
+        protected override Expression VisitExpression(ConstantExpression constantExpression)
         {
             executeBefore[ExpressionNode.GetExpressionNode(constantExpression, -1)] = new ExpressionNode[0];
             return constantExpression;
