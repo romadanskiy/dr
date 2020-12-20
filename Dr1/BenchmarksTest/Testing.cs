@@ -2,96 +2,98 @@
 
 namespace BenchmarksTest
 {
-   public class MyClass
+    public class TestMethods
     {
-        public override string ToString()
+        public static void StaticCycle(object obj)
         {
-            return "s";
-        }
-    }
-    
-    public class Benchmarks
-    {
-        public void Cycle(object obj)
-        {
-            var s = obj.ToString();
-            var testString = "";
-            for (var i = 0; i < 100; i++)
+            var n = obj.ToString().Length;
+            var res = 0;
+            for (var i = 0; i < 10; i++)
             {
-                testString += s;
+                res += n;
             }
         }
-
-        [Benchmark(Description = "PublicMethod")]
-        public void InvokePubicMethod()
+        
+        public void Cycle(object obj)
         {
-            Public();
+            var n = obj.ToString().Length;
+            var res = 0;
+            for (var i = 0; i < 10; i++)
+            {
+                res += n;
+            }
         }
         
-        public void Public()
+        public void Method()
         {
             Cycle("s");
         }
 
-        [Benchmark(Description = "VirtualMethod")]
-        public void InvokeVirtualMethod()
-        {
-            VirtualMethod();
-        }
-        
         public virtual void VirtualMethod()
         {
             Cycle("s");
         }
+        
+        public static void StaticMethod()
+        {
+            StaticCycle("s");
+        }
 
+        public void GenericMethod<T>(T obj)
+            where T : TestMethods
+        {
+            obj.Cycle("s");
+        }
+        
+        public void DynamicMethod(dynamic obj)
+        {
+            obj.Cycle("s");
+        }
+
+        public void ReflectionMethod()
+        {
+            GetType().GetMethod("Cycle")?.Invoke(new TestMethods(), new object[] {"s"});
+        }
+    }
+
+    public class Benchmarks
+    {
+        public TestMethods test = new TestMethods();
+        
+        [Benchmark(Description = "NonStaticMethod")]
+        public void InvokeNonStaticMethod()
+        {
+            test.Method();
+        }
+        
+        [Benchmark(Description = "VirtualMethod")]
+        public void InvokeVirtualMethod()
+        {
+            test.VirtualMethod();
+        }
+        
         [Benchmark(Description = "StaticMethod")]
         public void InvokeStaticMethod()
         {
-            Static();
+            TestMethods.StaticMethod();
         }
         
-        public static void Static()
-        {
-            var s = "s";
-            var testString = "";
-            for (var i = 0; i < 100; i++)
-            {
-                testString += s;
-            }
-        }
-
         [Benchmark(Description = "GenericMethod")]
         public void InvokeGenericMethod()
         {
-            Generic(new MyClass());
+            test.GenericMethod(new TestMethods());
         }
         
-        public void Generic<T>(T s)
-            where T : MyClass
-        {
-            Cycle(s.ToString());
-        }
-
         [Benchmark(Description = "DynamicMethod")]
         public void InvokeDynamicMethod()
         {
-            Dynamic(new MyClass());
+            test.DynamicMethod(test);
         }
         
-        public void Dynamic(dynamic obj)
-        {
-            Cycle(obj);
-        }
-
         [Benchmark(Description = "ReflectionMethod")]
         public void InvokeReflectionMethod()
         {
-            ReflectionMethod();
-        }
-        
-        public void ReflectionMethod()
-        {
-            GetType().GetMethod("Cycle").Invoke(new Benchmarks(), new [] {"s"});
+            test.ReflectionMethod();
         }
     }
 }
