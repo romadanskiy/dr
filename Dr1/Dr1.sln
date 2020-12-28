@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientExpressionTreeTests",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EditorFor", "EditorFor\EditorFor.csproj", "{32EBE96C-794A-4C3D-A9BD-494D20705334}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BenchmarksTest", "BenchmarksTest\BenchmarksTest.csproj", "{CE2A1E4B-7A2A-4661-9D24-644BFAC73273}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{E502A541-9000-4008-9B27-A9D17DB0F12B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{32EBE96C-794A-4C3D-A9BD-494D20705334}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{32EBE96C-794A-4C3D-A9BD-494D20705334}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE2A1E4B-7A2A-4661-9D24-644BFAC73273}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE2A1E4B-7A2A-4661-9D24-644BFAC73273}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE2A1E4B-7A2A-4661-9D24-644BFAC73273}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE2A1E4B-7A2A-4661-9D24-644BFAC73273}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
